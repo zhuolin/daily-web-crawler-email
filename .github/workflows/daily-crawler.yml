@@ -1,0 +1,62 @@
+name: Daily Web Crawler
+
+on:
+  schedule:
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'Web page URL to crawl'
+        required: true
+        type: string
+        default: 'https://www.fedcourt.gov.au/court-calendar/daily-court-lists/vic'
+      names:
+        description: 'Names separated by |'
+        required: true
+        type: string
+        default: 'Alleyway'
+
+permissions:
+  contents: read
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10'
+
+      - name: Determine parameters
+        id: params
+        env:
+          INPUT_URL: ${{ inputs.url }}
+          INPUT_NAMES: ${{ inputs.names }}
+          VARIABLE_URL: ${{ vars.CRAWL_URL }}
+          VARIABLE_NAMES: ${{ vars.SEARCH_NAMES }}
+        shell: bash
+        run: |
+          if [ -n "$INPUT_URL" ]; then echo "url=$INPUT_URL" >> "$GITHUB_OUTPUT"; else echo "url=$VARIABLE_URL" >> "$GITHUB_OUTPUT"; fi
+          if [ -n "$INPUT_NAMES" ]; then echo "names=$INPUT_NAMES" >> "$GITHUB_OUTPUT"; else echo "names=$VARIABLE_NAMES" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Run crawler
+        env:
+          CRAWL_URL: ${{ steps.params.outputs.url }}
+          SEARCH_NAMES: ${{ steps.params.outputs.names }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+        run: ./gradlew run

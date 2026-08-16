@@ -1,0 +1,11 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+repositories { mavenCentral() }
+dependencies {
+    implementation 'org.jsoup:jsoup:1.21.1'
+    implementation 'org.eclipse.angus:angus-mail:2.0.3'
+}
+application { mainClass = 'com.example.crawler.WebCrawler' }
+java { toolchain { languageVersion = JavaLanguageVersion.of(17) } }

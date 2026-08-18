@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Properties;
 
 public class WebCrawler {
-    private static final int TIMEOUT_MS = 30_000;
+    private static final int TIMEOUT_MS = 30000;
     private static final int CONTEXT_CHARS = 180;
 
     public static void main(String[] args) {
@@ -39,12 +39,10 @@ public class WebCrawler {
             Document document = Jsoup.connect(url)
                     //.userAgent("DailyWebCrawler/1.0 (+GitHub Actions)")
                     .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-                    .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
-                    .header("Accept-Language", "en-US,en;q=0.5")
-                    .header("Accept-Encoding", "gzip, deflate, br")
+                    .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8")
+                    .header("Accept-Language", "en-AU,en-GB;q=0.9,en;q=0.8")
                     .header("Connection", "keep-alive")
-                    .referrer("https://google.com")
-                    .timeout(10000)
+                    .header("Upgrade-Insecure-Requests", "1")
                     //.method(Connection.Method.GET)
                     .timeout(TIMEOUT_MS).followRedirects(true).get();
 

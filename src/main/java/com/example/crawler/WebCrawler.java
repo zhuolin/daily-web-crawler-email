@@ -36,7 +36,7 @@ public class WebCrawler {
             System.out.println("URL: " + url);
 
             Document document = Jsoup.connect(url)
-                    .userAgent("DailyWebCrawler/1.0 (+GitHub Actions)")
+                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36")
                     .timeout(TIMEOUT_MS).followRedirects(true).get();
 
             String pageText = document.body() == null ? document.text() : document.body().text();

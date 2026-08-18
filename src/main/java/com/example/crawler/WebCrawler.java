@@ -3,6 +3,7 @@ package com.example.crawler;
 import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -36,7 +37,15 @@ public class WebCrawler {
             System.out.println("URL: " + url);
 
             Document document = Jsoup.connect(url)
-                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36")
+                    //.userAgent("DailyWebCrawler/1.0 (+GitHub Actions)")
+                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+                    .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
+                    .header("Accept-Language", "en-US,en;q=0.5")
+                    .header("Accept-Encoding", "gzip, deflate, br")
+                    .header("Connection", "keep-alive")
+                    .referrer("https://google.com")
+                    .timeout(10000)
+                    //.method(Connection.Method.GET)
                     .timeout(TIMEOUT_MS).followRedirects(true).get();
 
             String pageText = document.body() == null ? document.text() : document.body().text();

@@ -41,7 +41,7 @@ public class WebCrawler {
                     .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
                     .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8")
                     .header("Accept-Language", "en-AU,en-GB;q=0.9,en;q=0.8")
-                    .header("Connection", "keep-alive")
+                    //.header("Connection", "keep-alive")
                     .header("Upgrade-Insecure-Requests", "1")
                     //.method(Connection.Method.GET)
                     .timeout(TIMEOUT_MS).followRedirects(true).get();

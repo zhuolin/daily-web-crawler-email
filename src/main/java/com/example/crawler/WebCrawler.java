@@ -43,8 +43,10 @@ public class WebCrawler {
                     .header("Accept-Language", "en-AU,en-GB;q=0.9,en;q=0.8")
                     //.header("Connection", "keep-alive")
                     .header("Upgrade-Insecure-Requests", "1")
+                    .referrer("https://www.google.com/")
                     //.method(Connection.Method.GET)
-                    .timeout(TIMEOUT_MS).followRedirects(true).get();
+                    .timeout(TIMEOUT_MS)
+                    .get();
 
             String pageText = document.body() == null ? document.text() : document.body().text();
             String normalizedPage = normalize(pageText);

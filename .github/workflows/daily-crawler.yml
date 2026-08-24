@@ -21,7 +21,7 @@ permissions:
 
 jobs:
   crawl:
-    runs-on: northcentralus
+    runs-on: codespaces-prebuild
     steps:
       - name: Checkout
         uses: actions/checkout@v4

@@ -21,7 +21,7 @@ permissions:
 
 jobs:
   crawl:
-    runs-on: australia-east
+    runs-on: northcentralus
     steps:
       - name: Checkout
         uses: actions/checkout@v4

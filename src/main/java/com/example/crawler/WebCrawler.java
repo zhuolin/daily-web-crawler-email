@@ -1,6 +1,7 @@
 package com.example.crawler;
 
 import jakarta.mail.*;
+import jakarta.mail.internet.AddressException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import org.jsoup.Connection;
@@ -19,7 +20,7 @@ public class WebCrawler {
     private static final int TIMEOUT_MS = 30000;
     private static final int CONTEXT_CHARS = 180;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws MessagingException {
         String url = getParameter(args, "url", "CRAWL_URL");
         String namesValue = getParameter(args, "names", "SEARCH_NAMES");
 
@@ -43,6 +44,7 @@ public class WebCrawler {
                     .header("Accept-Language", "en-AU,en-GB;q=0.9,en;q=0.8")
                     //.header("Connection", "keep-alive")
                     .header("Upgrade-Insecure-Requests", "1")
+                    .header("Content-Type","application/x-www-form-urlencoded")
                     .referrer("https://www.google.com/")
                     //.method(Connection.Method.GET)
                     .timeout(TIMEOUT_MS)
@@ -77,8 +79,39 @@ public class WebCrawler {
         } catch (Exception e) {
             System.err.println("Crawler failed: " + e.getMessage());
             e.printStackTrace();
+            sendErrorNotification();
             System.exit(1);
         }
+    }
+
+    private static void sendErrorNotification() throws MessagingException {
+        String host = requiredEnv("SMTP_HOST");
+        String port = envOrDefault("SMTP_PORT", "587");
+        String username = requiredEnv("SMTP_USERNAME");
+        String password = requiredEnv("SMTP_PASSWORD");
+        String from = requiredEnv("EMAIL_FROM");
+        String to = requiredEnv("MY_EMAIL");
+        Properties props = new Properties();
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", port);
+        props.put("mail.smtp.auth", "true");
+        if ("465".equals(port)) {
+            props.put("mail.smtp.ssl.enable", "true");
+        } else {
+            props.put("mail.smtp.starttls.enable", "true");
+            props.put("mail.smtp.starttls.required", "true");
+        }
+        Session session = Session.getInstance(props, new Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, password);
+            }
+        });
+        MimeMessage message = new MimeMessage(session);
+        message.setFrom(new InternetAddress(from));
+        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+        message.setSubject("Alleyway daily crawler error GitHub.");
+        message.setText("Alleyway crawler daily schedule job at GitHub failed today. Please check scheduler log.");
+        Transport.send(message);
     }
 
     private static void sendNotification(String url, LocalDateTime checkedAt,

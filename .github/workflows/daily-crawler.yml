@@ -11,10 +11,10 @@ on:
         type: string
         default: 'https://www.fedcourt.gov.au/court-calendar/daily-court-lists/vic'
       names:
-        description: 'Names separated by |'
+        description: 'Names separated by |, case insensitive'
         required: true
         type: string
-        default: 'Alleyway'
+        default: 'alleyway|fortune alley|ivory bond|haoding|youleyao|xingshuyuan|kobo|yuanchao|chenyu|waku'
 
 permissions:
   contents: read

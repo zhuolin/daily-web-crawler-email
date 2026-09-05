@@ -23,64 +23,64 @@ public class WebCrawler {
     public static void main(String[] args) throws MessagingException {
         String url = getParameter(args, "url", "CRAWL_URL");
         String namesValue = getParameter(args, "names", "SEARCH_NAMES");
+        List<String> names = Arrays.stream(namesValue.split("\\|")).map(String::trim).filter(s -> !s.isEmpty()).toList();
 
         require(url, "CRAWL_URL / --url");
+        List<String> urls = Arrays.stream(url.split("\\|")).map(String::trim).filter(s -> !s.isEmpty()).toList();
         require(namesValue, "SEARCH_NAMES / --names");
-        validateUrl(url);
 
-        List<String> names = Arrays.stream(namesValue.split("\\|"))
-                .map(String::trim).filter(s -> !s.isEmpty()).toList();
+        LocalDateTime checkedAt = LocalDateTime.now(ZoneOffset.UTC);
+        System.out.println("Daily Web Crawler");
+        System.out.println("UTC: " + checkedAt);
+        System.out.println("URL: " + url);
 
-        try {
-            LocalDateTime checkedAt = LocalDateTime.now(ZoneOffset.UTC);
-            System.out.println("Daily Web Crawler");
-            System.out.println("UTC: " + checkedAt);
-            System.out.println("URL: " + url);
-
-            Document document = Jsoup.connect(url)
-                    //.userAgent("DailyWebCrawler/1.0 (+GitHub Actions)")
-                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-                    .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8")
-                    .header("Accept-Language", "en-AU,en-GB;q=0.9,en;q=0.8")
-                    //.header("Connection", "keep-alive")
-                    .header("Upgrade-Insecure-Requests", "1")
-                    .header("Content-Type","application/x-www-form-urlencoded")
-                    .referrer("https://www.google.com/")
-                    //.method(Connection.Method.GET)
-                    .timeout(TIMEOUT_MS)
-                    .get();
-
-            String pageText = document.body() == null ? document.text() : document.body().text();
-            String normalizedPage = normalize(pageText);
-            List<Match> matches = new ArrayList<>();
-
-            for (String name : names) {
-                String normalizedName = normalize(name);
-                int position = normalizedPage.indexOf(normalizedName);
-                if (position >= 0) {
-                    String context = normalizedPage.substring(
-                            Math.max(0, position - CONTEXT_CHARS),
-                            Math.min(normalizedPage.length(),
-                                    position + normalizedName.length() + CONTEXT_CHARS));
-                    matches.add(new Match(name, context.trim()));
-                    System.out.println("FOUND: " + name);
-                    System.out.println("CONTEXT: " + context.trim());
-                } else {
-                    System.out.println("NOT FOUND: " + name);
+        for (String eachUrl : urls) {
+            try {
+                validateUrl(eachUrl);
+                System.out.println("Start to process with URL " + eachUrl);
+                Document document = Jsoup.connect(url)
+                        //.userAgent("DailyWebCrawler/1.0 (+GitHub Actions)")
+                        .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+                        .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8")
+                        .header("Accept-Language", "en-AU,en-GB;q=0.9,en;q=0.8")
+                        //.header("Connection", "keep-alive")
+                        .header("Upgrade-Insecure-Requests", "1")
+                        .header("Content-Type","application/x-www-form-urlencoded")
+                        .referrer("https://www.google.com/")
+                        //.method(Connection.Method.GET)
+                        .timeout(TIMEOUT_MS)
+                        .get();
+                String pageText = document.body() == null ? document.text() : document.body().text();
+                String normalizedPage = normalize(pageText);
+                List<Match> matches = new ArrayList<>();
+                for (String name : names) {
+                    String normalizedName = normalize(name);
+                    int position = normalizedPage.indexOf(normalizedName);
+                    if (position >= 0) {
+                        String context = normalizedPage.substring(
+                                Math.max(0, position - CONTEXT_CHARS),
+                                Math.min(normalizedPage.length(),
+                                        position + normalizedName.length() + CONTEXT_CHARS));
+                        matches.add(new Match(name, context.trim()));
+                        System.out.println("FOUND: " + name);
+                        System.out.println("CONTEXT: " + context.trim());
+                    } else {
+                        System.out.println("NOT FOUND: " + name);
+                    }
                 }
-            }
 
-            if (!matches.isEmpty()) {
-                sendNotification(url, checkedAt, matches);
-                System.out.println("Notification email sent.");
-            } else {
-                System.out.println("No matches; no email sent.");
+                if (!matches.isEmpty()) {
+                    sendNotification(url, checkedAt, matches);
+                    System.out.println("Notification email sent.");
+                } else {
+                    System.out.println("No matches; no email sent.");
+                }
+            } catch (Exception e) {
+                System.err.println("Crawler failed: " + e.getMessage());
+                e.printStackTrace();
+                sendErrorNotification();
+                System.exit(1);
             }
-        } catch (Exception e) {
-            System.err.println("Crawler failed: " + e.getMessage());
-            e.printStackTrace();
-            sendErrorNotification();
-            System.exit(1);
         }
     }
 

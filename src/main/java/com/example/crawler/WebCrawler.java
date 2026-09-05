@@ -38,7 +38,7 @@ public class WebCrawler {
             try {
                 validateUrl(eachUrl);
                 System.out.println("Start to process with URL " + eachUrl);
-                Document document = Jsoup.connect(url)
+                Document document = Jsoup.connect(eachUrl)
                         //.userAgent("DailyWebCrawler/1.0 (+GitHub Actions)")
                         .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
                         .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8")
@@ -70,7 +70,7 @@ public class WebCrawler {
                 }
 
                 if (!matches.isEmpty()) {
-                    sendNotification(url, checkedAt, matches);
+                    sendNotification(eachUrl, checkedAt, matches);
                     System.out.println("Notification email sent.");
                 } else {
                     System.out.println("No matches; no email sent.");

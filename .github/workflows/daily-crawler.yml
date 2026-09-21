@@ -9,7 +9,7 @@ on:
         description: 'Web page URL to crawl'
         required: true
         type: string
-        default: 'https://www.fedcourt.gov.au/court-calendar/daily-court-lists/vic|https://www.fedcourt.gov.au/court-calendar/daily-court-lists/nsw'
+        default: 'https://www.fedcourt.gov.au/court-calendar/daily-court-lists/vic|https://www.fedcourt.gov.au/court-calendar/daily-court-lists/nsw|https://www.fcfcoa.gov.au/gfl/courtlists/nsw/sydney'
       names:
         description: 'Names separated by |, case insensitive'
         required: true

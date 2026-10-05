@@ -59,4 +59,5 @@ jobs:
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
           EMAIL_FROM: ${{ vars.EMAIL_FROM }}
           EMAIL_TO: ${{ vars.EMAIL_TO }}
+          MY_EMAIL: ${{secrets.MY_EMAIL}}
         run: ./gradlew run
